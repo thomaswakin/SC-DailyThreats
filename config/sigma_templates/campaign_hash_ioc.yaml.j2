@@ -1,0 +1,28 @@
+title: {{ title }}
+id: {{ rule_id }}
+status: experimental
+description: |
+  {{ description }}
+author: ThreatIntelBot
+date: {{ date }}
+references:
+  - {{ source_url }}
+{% for url in mitre_urls %}
+  - {{ url }}
+{% endfor %}
+tags:
+{% for tag in mitre_tags %}
+  - {{ tag }}
+{% endfor %}
+logsource:
+  category: file_event
+detection:
+  selection:
+    Hashes|contains:
+{% for h in hashes %}
+      - '{{ h.type }}={{ h.value }}'
+{% endfor %}
+  condition: selection
+falsepositives:
+  - Validate hashes against current threat context before deploying
+level: {{ level }}

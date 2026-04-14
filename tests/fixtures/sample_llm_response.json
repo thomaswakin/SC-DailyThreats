@@ -1,0 +1,15 @@
+{
+  "threat_actors": [
+    {
+      "name": "APT29",
+      "aliases": ["Cozy Bear", "Midnight Blizzard", "NOBELIUM"],
+      "confidence": 0.85
+    }
+  ],
+  "summary": "APT29 has launched a targeted spearphishing campaign against energy sector organizations, deploying a new backdoor variant via malicious Office documents that execute PowerShell payloads. The campaign demonstrates continued evolution of their tradecraft with improved C2 infrastructure.",
+  "severity": 0.82,
+  "new_ttps": ["T1566.001", "T1059.001", "T1071.001", "T1547.001"],
+  "targeted_sectors": ["energy", "utilities"],
+  "targeted_regions": ["Europe", "North America"],
+  "motivation": "espionage"
+}

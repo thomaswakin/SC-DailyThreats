@@ -1,0 +1,31 @@
+.env
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# macOS
+.DS_Store
+
+# Claude Code project memory
+.claude/
+
+# Generated data - exclude DB, keep output structure
+data/db/*.db
+data/db/*.db-shm
+data/db/*.db-wal
+
+# Briefing and sigma output content (keep dir structure via .gitkeep)
+data/briefings/*.md
+data/briefings/*.json
+data/briefings/ioc_exports/
+data/sigma_rules/*/
+
+# Logs
+logs/*.log

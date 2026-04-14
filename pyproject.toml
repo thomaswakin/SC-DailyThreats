@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "threats"
+version = "0.1.0"
+description = "Daily Threat Intelligence briefing and Sigma rule generation"
+requires-python = ">=3.11"
+dependencies = [
+    "feedparser>=6.0",
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+    "anthropic>=0.25",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+    "pydantic>=2.6",
+    "schedule>=1.2",
+    "iocextract>=1.16",
+    "python-dotenv>=1.0",
+    "lxml>=5.0",
+    "markdown>=3.6",
+    "keyring>=25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.12",
+    "responses>=0.25",
+    "pytest-cov>=5.0",
+]
+
+[project.scripts]
+threats-cli = "threats.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["threats*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

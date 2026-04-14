@@ -1,0 +1,36 @@
+title: {{ title }}
+id: {{ rule_id }}
+status: experimental
+description: |
+  {{ description }}
+author: ThreatIntelBot
+date: {{ date }}
+references:
+  - {{ source_url }}
+{% for url in mitre_urls %}
+  - {{ url }}
+{% endfor %}
+tags:
+{% for tag in mitre_tags %}
+  - {{ tag }}
+{% endfor %}
+logsource:
+{% if ioc_kind == "ip" %}
+  category: firewall
+{% else %}
+  category: dns
+{% endif %}
+detection:
+  selection:
+{% if ioc_kind == "ip" %}
+    dst_ip:
+{% else %}
+    dns.query.name:
+{% endif %}
+{% for value in values %}
+      - '{{ value }}'
+{% endfor %}
+  condition: selection
+falsepositives:
+  - Verify against asset inventory and threat context before actioning
+level: {{ level }}

@@ -1,0 +1,31 @@
+title: {{ title }}
+id: {{ rule_id }}
+status: experimental
+description: |
+  {{ description }}
+author: ThreatIntelBot
+date: {{ date }}
+references:
+  - {{ source_url }}
+{% for url in mitre_urls %}
+  - {{ url }}
+{% endfor %}
+tags:
+{% for tag in mitre_tags %}
+  - {{ tag }}
+{% endfor %}
+logsource:
+  category: dns
+  product: ~
+detection:
+{% for value in values %}
+  selection_{{ loop.index }}:
+    dns.query.name: '{{ value }}'
+{% endfor %}
+  condition: {% for i in range(1, ioc_count + 1) %}selection_{{ i }}{% if not loop.last %} or {% endif %}{% endfor %}
+
+falsepositives:
+  - Individual indicators may fire legitimately; investigate when 2+ indicators
+    are observed from the same host within a short timeframe (30 minutes)
+  - Enterprise environments may have legitimate use cases for some of these tools
+level: {{ level }}

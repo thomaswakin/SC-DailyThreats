@@ -1,0 +1,81 @@
+# Daily Threat Intel - Runtime Settings
+# Override any value with an environment variable (THREATS_<KEY>=value)
+
+pipeline:
+  # How far back to look for new articles per run (hours).
+  # 72h catches Mon-Wed-Fri publication cycles without missing anything.
+  # For an initial historical backfill, set to 720 (30 days) for one run,
+  # then reset to 72 for ongoing daily operation.
+  lookback_hours: 72
+  # Run time for scheduled daily job (24h format)
+  run_at: "06:00"
+  # Max items to process per run (prevents runaway costs)
+  max_items_per_run: 200
+  # Minimum confidence score to include IOC in output (0.0-1.0)
+  ioc_min_confidence: 0.5
+
+llm:
+  model: "claude-opus-4-6"
+  max_tokens: 1024
+  # Max requests per minute across all LLM calls
+  rpm_limit: 40
+  # Max characters of article body sent for analysis (cost control)
+  max_body_chars: 10000
+  # If true, skip LLM enrichment (still extract IOCs/TTPs via regex)
+  disabled: false
+
+http:
+  timeout_seconds: 30
+  retries: 3
+  retry_backoff_factor: 0.5
+  # Seconds between requests to the same domain
+  per_domain_delay: 1.0
+  user_agent: "ThreatIntelBot/1.0 (research; contact: security@example.com)"
+
+storage:
+  db_path: "data/db/threats.db"
+  # Days to retain raw items before pruning
+  retention_days: 90
+
+output:
+  briefings_dir: "data/briefings"
+  sigma_dir: "data/sigma_rules"
+  # Formats to render: md, json (comma-separated)
+  formats: "md,json"
+
+sigma:
+  # Rule status applied to all generated rules
+  status: "experimental"
+  # Default log sources - extend per IOC type in sigma.py
+  logsources:
+    network:
+      category: proxy
+      product: ~
+    endpoint:
+      category: process_creation
+      product: windows
+    dns:
+      category: dns
+      product: ~
+    file:
+      category: file_event
+      product: windows
+
+email:
+  # Recipient list — SMTP credentials go in .env (SMTP_HOST, SMTP_USER, SMTP_PASSWORD)
+  to:
+    - "takin@stellarcyber.ai"
+  cc:
+    - "cbriguet@stellarcyber.ai"
+    - "xyu@stellarcyber.ai"
+    - "hwu@stellarcyber.ai"
+  subject_prefix: "[ThreatIntel]"
+  # SMTP port — 587 (STARTTLS) is correct for Gmail/O365/most providers
+  smtp_port: 587
+
+logging:
+  level: "INFO"
+  log_file: "logs/threats.log"
+  # Max log file size before rotation (bytes)
+  max_bytes: 10485760  # 10 MB
+  backup_count: 5

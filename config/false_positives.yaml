@@ -1,0 +1,287 @@
+# Known false-positive IOC values to exclude entirely from extraction and storage.
+# These are legitimate domains, IPs, and patterns that appear in security research
+# articles but are NOT indicators of malicious activity.
+
+domains:
+  # Security vendors & tools (commonly cited in research articles)
+  - snort.org
+  - virustotal.com
+  - shodan.io
+  - censys.io
+  - greynoise.io
+  - misp-project.org
+  - mitre.org
+  - attack.mitre.org
+  - cve.mitre.org
+  - nvd.nist.gov
+  - abuse.ch
+  - urlhaus.abuse.ch
+  - threatfox.abuse.ch
+  - bazaar.abuse.ch
+  - feodotracker.abuse.ch
+  - otx.alienvault.com
+  - alienvault.com
+
+  # Research team blogs (source domains, not threat infrastructure)
+  - talosintelligence.com
+  - blog.talosintelligence.com
+  - unit42.paloaltonetworks.com
+  - paloaltonetworks.com
+  - crowdstrike.com
+  - sentinelone.com
+  - welivesecurity.com
+  - eset.com
+  - mandiant.com
+  - recordedfuture.com
+  - secureworks.com
+  - huntress.com
+  - redcanary.com
+  - lumen.com
+  - blog.lumen.com
+  - volexity.com
+  - elastic.co
+  - wiz.io
+  - sysdig.com
+  - nccgroup.com
+  - sekoia.io
+  - msrc.microsoft.com
+  - microsoft.com
+  - techcommunity.microsoft.com
+
+  # Common legitimate infrastructure
+  - google.com
+  - googleapis.com
+  - gstatic.com
+  - github.com
+  - githubusercontent.com
+  - githubusercontent.com
+  - gitlab.com
+  - pastebin.com
+  - amazon.com
+  - amazonaws.com
+  - cloudfront.net
+  - apple.com
+  - icloud.com
+  - akamai.com
+  - akamaiedge.net
+  - fastly.net
+  - cloudflare.com
+  - twitter.com
+  - x.com
+  - linkedin.com
+  - youtube.com
+  - facebook.com
+  - reddit.com
+  - wikipedia.org
+  - archive.org
+
+  # Standards / reference bodies
+  - ietf.org
+  - w3.org
+  - rfc-editor.org
+  - nist.gov
+  - cisa.gov
+  - us-cert.gov
+  - cert.org
+
+  # US federal government — frequently cited as impersonation targets in phishing articles,
+  # never threat infrastructure
+  - irs.gov
+  - ssa.gov
+  - usps.com
+  - ups.com
+  - fedex.com
+  - dhs.gov
+  - fbi.gov
+  - doj.gov
+  - state.gov
+  - treasury.gov
+  - hhs.gov
+  - va.gov
+  - whitehouse.gov
+  - usa.gov
+
+  # Financial institutions — common phishing lure targets, not threat infrastructure
+  - chase.com
+  - bankofamerica.com
+  - wellsfargo.com
+  - citibank.com
+  - citi.com
+  - americanexpress.com
+  - paypal.com
+  - venmo.com
+  - cash.app
+  - zelle.com
+  - ally.com
+  - capitalone.com
+  - usbank.com
+  - tdbank.com
+  - pnc.com
+  - schwab.com
+  - fidelity.com
+  - vanguard.com
+
+  # Major tech platforms frequently impersonated in phishing
+  - office.com
+  - login.microsoftonline.com
+  - outlook.com
+  - live.com
+  - hotmail.com
+  - accounts.google.com
+  - myaccount.google.com
+  - appleid.apple.com
+  - docusign.com
+  - adobe.com
+  - zoom.us
+  - dropbox.com
+  - box.com
+  - sharepoint.com
+
+  # Shipping / delivery — common lure domains
+  - dhl.com
+  - dhlexpress.com
+  - fedex.com
+  - tnt.com
+
+  # IT vendors commonly cited in articles (not threat infrastructure)
+  - quest.com
+  - beyondtrust.com
+  - cyberark.com
+  - sailpoint.com
+  - okta.com
+  - onelogin.com
+  - pingidentity.com
+
+  # Generic test / example domains
+  - example.com
+  - example.org
+  - example.net
+  - test.com
+  - localhost.com
+  - domain.com
+
+# Specific IPs to exclude (beyond RFC 1918 / loopback handled in code)
+  # Auto-learned by IOC validator
+  - ohmymalware.com  # auto-learned 2026-03-24: This is almost certainly a fictional/example domain used in Elastic's product demonstration screenshots to illustrate ma
+
+  # Auto-learned by IOC validator
+  - gmail.com  # auto-learned 2026-04-01: Generic email service domain mentioned in context, not attacker infrastructure.
+
+  # Auto-learned by IOC validator
+  - packages.npm.org  # auto-learned 2026-04-02: This appears to be a reference to the legitimate npm package registry domain, not attacker infrastructure; however, note
+
+ips:
+  - 8.8.8.8
+  - 8.8.4.4
+  - 1.1.1.1
+  - 1.0.0.1
+  - 9.9.9.9
+
+# Domain suffixes — any domain ending in these is excluded
+# (e.g. .microsoft.com covers all MS subdomains)
+domain_suffixes:
+  - .microsoft.com
+  - .mitre.org
+  - .nist.gov
+  - .quest.com
+  - .google.com
+  - .amazon.com
+  - .amazonaws.com
+  - .apple.com
+  - .github.com
+  - .githubusercontent.com
+  - .cloudflare.com
+  - .akamai.com
+  - .akamaiedge.net
+  - .fastly.net
+  - .talosintelligence.com
+  - .paloaltonetworks.com
+  - .crowdstrike.com
+  - .sentinelone.com
+  - .recordedfuture.com
+  - .abuse.ch
+  # US federal government subdomains
+  - .irs.gov
+  - .ssa.gov
+  - .dhs.gov
+  - .fbi.gov
+  - .doj.gov
+  - .treasury.gov
+  - .hhs.gov
+  - .va.gov
+  - .usa.gov
+  - .mil
+  # Financial institution subdomains
+  - .chase.com
+  - .bankofamerica.com
+  - .wellsfargo.com
+  - .paypal.com
+  - .americanexpress.com
+  - .capitalone.com
+  # Major impersonated tech platforms
+  - .office.com
+  - .live.com
+  - .outlook.com
+  - .docusign.com
+  - .adobe.com
+  - .zoom.us
+  - .sharepoint.com
+
+# ── Context-dependent IOCs ──────────────────────────────────────────────────────
+# These are NOT false positives — they are legitimate IOCs that appear in real
+# threat reports. However, they are FP-prone in isolation because they are widely
+# used by both legitimate users and attackers. Flag them for correlation rather
+# than standalone alerting.
+#
+# Examples: anonymization tools, file-sharing platforms, legitimate remote access
+# tools, messaging apps — all used by threat actors but also by millions of legit users.
+
+context_dependent_domains:
+  # Anonymization / proxy infrastructure
+  - torproject.org
+  - www.torproject.org
+  - onion.ly
+  - privoxy.org
+
+  # File sharing / exfiltration platforms (dual-use)
+  - mega.nz
+  - mega.co.nz
+  - mediafire.com
+  - anonfiles.com
+  - transfer.sh
+  - gofile.io
+  - wetransfer.com
+  - sendspace.com
+  - dropbox.com
+  - onedrive.live.com
+  - drive.google.com
+
+  # Messaging / C2-over-legitimate-service
+  - telegram.org
+  - t.me
+  - discord.com
+  - discordapp.com
+  - cdn.discordapp.com
+
+  # Legitimate remote access tools (frequently abused)
+  - anydesk.com
+  - teamviewer.com
+  - logmein.com
+  - screenconnect.com
+  - connectwise.com
+  - splashtop.com
+  - rustdesk.com
+  - ngrok.com
+  - ngrok.io
+
+  # Code / scripting platforms (commonly used for payload staging)
+  - raw.githubusercontent.com
+  - gist.github.com
+  - paste.ee
+  - hastebin.com
+  - ghostbin.co
+
+context_dependent_domain_suffixes:
+  - .onion.ly
+  - .ngrok.io
+  - .ngrok-free.app

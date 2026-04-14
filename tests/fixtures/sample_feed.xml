@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Test Threat Intel Feed</title>
+    <link>https://example-threatintel.com</link>
+    <description>Test feed for unit testing</description>
+    <item>
+      <title>APT29 Targets Energy Sector with New Backdoor</title>
+      <link>https://example-threatintel.com/apt29-energy-backdoor</link>
+      <pubDate>Tue, 10 Mar 2026 08:00:00 +0000</pubDate>
+      <description>
+        APT29 (also known as Cozy Bear) has been observed targeting energy sector organizations
+        with a new backdoor variant. The campaign uses spearphishing emails to deliver
+        malicious documents that execute PowerShell commands.
+
+        Indicators of Compromise:
+        C2 IP: 185.220.101.47
+        Domain: malicious-update[.]com
+        SHA256: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+        T1566.001 T1059.001 T1071.001
+      </description>
+    </item>
+    <item>
+      <title>LockBit 3.0 Infrastructure Update</title>
+      <link>https://example-threatintel.com/lockbit-infrastructure</link>
+      <pubDate>Mon, 09 Mar 2026 14:30:00 +0000</pubDate>
+      <description>
+        New LockBit 3.0 infrastructure has been identified. Ransomware group continues
+        operations with updated TTPs including credential dumping and lateral movement.
+        New C2 domain: lockbit-cdn[.]net
+        IP: 91.92.251.103
+      </description>
+    </item>
+  </channel>
+</rss>

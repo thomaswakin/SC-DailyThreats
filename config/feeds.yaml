@@ -1,0 +1,185 @@
+# Threat Intelligence Feed Sources — Primary Research Teams Only
+# These sources conduct original malware analysis, APT tracking, and publish
+# novel TTPs that translate directly into detection engineering / Sigma rules.
+#
+# Excluded intentionally:
+#   - Generic IOC feeds (URLhaus, ThreatFox, OTX) — already covered by your product
+#   - News/journalism (BleepingComputer, DarkReading) — no original research
+#   - Government alert feeds (CISA, FBI, NCSC) — no TTPs, no Sigma utility
+#   - Aggregators (Recorded Future blog, Proofpoint) — commentary, not primary research
+#
+# collector: rss | scraper
+# reliability: authoritative | high | medium
+# tlp: white
+
+feeds:
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # TIER 1 — Primary Research, Highest Sigma Yield
+  # ══════════════════════════════════════════════════════════════════════════
+
+  - name: "Elastic Security Labs"
+    url: "https://www.elastic.co/security-labs/rss/feed.xml"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [detection-engineering, malware, endpoint, sigma]
+    notes: "Publishes detection rules alongside research. Direct Sigma source."
+
+  - name: "The DFIR Report"
+    url: "https://thedfirreport.com/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [incident-response, ransomware, full-attack-chain, ttps]
+    notes: "Full intrusion reconstructions with timestamped TTP chains. Best raw source for behavioral Sigma rules."
+
+  - name: "Microsoft MSTIC"
+    url: "https://www.microsoft.com/en-us/security/blog/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [nation-state, apt, azure, windows, identity]
+    notes: "Unique telemetry from Windows/Azure/AD. Nation-state campaign coverage."
+
+  - name: "Mandiant Threat Intelligence"
+    url: "https://www.mandiant.com/resources/blog/rss.xml"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [apt, nation-state, malware, campaign-tracking]
+    notes: "Longest-running APT tracking program. Deep actor profiles and novel malware families."
+
+  - name: "CrowdStrike Blog"
+    url: "https://www.crowdstrike.com/blog/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [apt, ecrime, ransomware, adversary-intelligence]
+    notes: "eCrime + nation-state. Named adversary tracking (FANCY BEAR, SCATTERED SPIDER, etc.)."
+
+  - name: "Unit 42 (Palo Alto Networks)"
+    url: "https://unit42.paloaltonetworks.com/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [malware, apt, vulnerabilities, campaign-analysis]
+    notes: "Original malware reversing and campaign analysis. Strong on novel loaders and C2 frameworks."
+
+  - name: "Cisco Talos Intelligence"
+    url: "https://blog.talosintelligence.com/rss/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [malware, network, email, vulnerability-exploitation]
+    notes: "Original research from one of the largest threat intel teams. Strong on email-delivered threats and network-based detection."
+
+  - name: "SentinelOne Labs"
+    url: "https://www.sentinelone.com/labs/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [malware, apt, edr-detection, reverse-engineering]
+    notes: "Deep malware reversing with EDR visibility. Publishes YARA and behavioral indicators."
+
+  - name: "ESET Research"
+    url: "https://www.welivesecurity.com/en/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [apt, malware, eastern-europe, reverse-engineering]
+    notes: "Top-tier APT research. Strongest coverage of Russia/China/North Korea nexus groups."
+
+  - name: "Volexity"
+    url: "https://www.volexity.com/blog/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [nation-state, memory-forensics, zero-day, apt]
+    notes: "Discovers and documents nation-state intrusions with memory forensics depth. Frequently first to report zero-day exploitation in the wild."
+
+  - name: "Google Project Zero"
+    url: "https://googleprojectzero.blogspot.com/feeds/posts/default"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [vulnerability, exploit, zero-day, browser, kernel]
+    notes: "Ground-truth exploit research. Critical for detection of exploit chains and post-exploitation."
+
+  - name: "Lumen Black Lotus Labs"
+    url: "https://blog.lumen.com/category/black-lotus-labs/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [botnets, network-infrastructure, routers, c2-tracking]
+    notes: "Unique network-level visibility for botnet and C2 infrastructure tracking."
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # TIER 2 — Original Research, Strong TTP Coverage
+  # ══════════════════════════════════════════════════════════════════════════
+
+  - name: "Red Canary Threat Detection"
+    url: "https://redcanary.com/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [detection-engineering, threat-hunting, endpoint, ttps]
+    notes: "Detection-first research team. Publishes prevalence data on techniques and detection logic."
+
+  - name: "Secureworks CTU"
+    url: "https://www.secureworks.com/rss/research"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [apt, ecrime, ransomware, structured-intelligence]
+    notes: "Counter Threat Unit. Long-running structured APT and eCrime tracking with GOLD/IRON/BRONZE naming."
+
+  - name: "Huntress Threat Operations"
+    url: "https://www.huntress.com/blog/rss.xml"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [smb, living-off-the-land, ransomware, msp-threats]
+    notes: "Unique SMB/MSP threat visibility. Discovers techniques targeting environments larger teams miss."
+
+  - name: "Wiz Research"
+    url: "https://www.wiz.io/feed/rss.xml"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [cloud, aws, azure, gcp, container, misconfigurations]
+    notes: "Cloud-native threat research. Emerging techniques targeting cloud infrastructure and identity."
+
+  - name: "Sysdig Threat Research Team"
+    url: "https://sysdig.com/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [container, kubernetes, cloud, runtime-threats]
+    notes: "Container and cloud runtime threat research. Unique visibility into Kubernetes-targeting attacks."
+
+  - name: "NCC Group Research"
+    url: "https://research.nccgroup.com/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [vulnerability, malware, red-team, reverse-engineering]
+    notes: "Technical deep-dives on vulnerabilities and malware. Strong offensive security research that informs detection."
+
+  - name: "Sekoia.io Threat Intelligence"
+    url: "https://blog.sekoia.io/feed/"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [apt, ecrime, france, european-coverage]
+    notes: "French threat intelligence team with strong European APT and eCrime coverage. Publishes detailed actor profiles."
+
+  - name: "Recorded Future Insikt Group"
+    url: "https://www.recordedfuture.com/feed"
+    collector: rss
+    reliability: high
+    tlp: white
+    tags: [apt, geopolitical, infrastructure-tracking, dark-web]
+    notes: "Insikt Group publishes original primary research (distinct from RF's commercial analysis). Strong on infrastructure tracking."
+
+  # Binarly - no public RSS feed available; monitor https://binarly.io manually

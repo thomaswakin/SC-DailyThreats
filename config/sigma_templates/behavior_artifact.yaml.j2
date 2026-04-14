@@ -1,0 +1,146 @@
+title: {{ title }}
+id: {{ rule_id }}
+status: experimental
+description: |
+  {{ description }}
+  Source: {{ source_name }} — {{ source_url }}
+author: ThreatIntelBot
+date: {{ date }}
+references:
+  - {{ source_url }}
+  - https://attack.mitre.org/techniques/{{ technique_id.replace('.', '/') }}/
+tags:
+  - attack.{{ tactic_tag }}
+  - attack.{{ technique_tag }}
+logsource:
+  category: {{ logsource_category }}
+{% if logsource_product %}
+  product: {{ logsource_product }}
+{% endif %}
+detection:
+{% if logsource_category == 'process_creation' %}
+{% if process_name and command_line %}
+  selection_process:
+    Image|endswith:
+{% for p in process_name %}
+      - '\{{ p }}'
+{% endfor %}
+  selection_cmdline:
+    CommandLine|contains:
+{% for c in command_line %}
+      - '{{ c }}'
+{% endfor %}
+{% if parent_process %}
+  selection_parent:
+    ParentImage|endswith:
+{% for p in parent_process %}
+      - '\{{ p }}'
+{% endfor %}
+  condition: (selection_process or selection_cmdline) and selection_parent
+{% else %}
+  condition: selection_process or selection_cmdline
+{% endif %}
+{% elif process_name %}
+  selection:
+    Image|endswith:
+{% for p in process_name %}
+      - '\{{ p }}'
+{% endfor %}
+{% if parent_process %}
+    ParentImage|endswith:
+{% for p in parent_process %}
+      - '\{{ p }}'
+{% endfor %}
+{% endif %}
+  condition: selection
+{% elif command_line %}
+  selection:
+    CommandLine|contains:
+{% for c in command_line %}
+      - '{{ c }}'
+{% endfor %}
+{% if parent_process %}
+    ParentImage|endswith:
+{% for p in parent_process %}
+      - '\{{ p }}'
+{% endfor %}
+{% endif %}
+  condition: selection
+{% endif %}
+{% elif logsource_category == 'file_event' %}
+  selection:
+    TargetFilename|contains:
+{% for f in file_path %}
+      - '{{ f }}'
+{% endfor %}
+  condition: selection
+{% elif logsource_category == 'registry_event' %}
+  selection:
+    TargetObject|startswith:
+{% for k in registry_key %}
+      - '{{ k }}'
+{% endfor %}
+  condition: selection
+{% elif logsource_category == 'network_connection' %}
+  selection:
+{% if network_dst_ip %}
+    DestinationIp:
+{% for ip in network_dst_ip %}
+      - '{{ ip }}'
+{% endfor %}
+{% endif %}
+{% if network_dst_port %}
+    DestinationPort:
+{% for port in network_dst_port %}
+      - {{ port }}
+{% endfor %}
+{% endif %}
+  condition: selection
+{% elif logsource_category == 'firewall' %}
+  selection:
+{% if network_dst_ip %}
+    dst_ip:
+{% for ip in network_dst_ip %}
+      - '{{ ip }}'
+{% endfor %}
+{% endif %}
+{% if network_dst_port %}
+    dst_port:
+{% for port in network_dst_port %}
+      - {{ port }}
+{% endfor %}
+{% endif %}
+  condition: selection
+{% elif logsource_category == 'dns_query' %}
+  selection:
+    QueryName:
+{% for d in dns_query %}
+      - '{{ d }}'
+{% endfor %}
+  condition: selection
+{% else %}
+  selection:
+{% if process_name %}
+    Image|endswith:
+{% for p in process_name %}
+      - '\{{ p }}'
+{% endfor %}
+{% endif %}
+{% if command_line %}
+    CommandLine|contains:
+{% for c in command_line %}
+      - '{{ c }}'
+{% endfor %}
+{% endif %}
+{% if file_path %}
+    TargetFilename|contains:
+{% for f in file_path %}
+      - '{{ f }}'
+{% endfor %}
+{% endif %}
+  condition: selection
+{% endif %}
+falsepositives:
+  - Legitimate administrative activity — verify against asset inventory and change management
+  - Security tools performing authorized scanning
+level: {{ level }}
