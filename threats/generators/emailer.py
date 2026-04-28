@@ -197,6 +197,25 @@ def send_briefing_email(
     sigma_html = _sigma_html_section(briefing.sigma_rules)
     sigma_plain = _sigma_plain_section(briefing.sigma_rules)
 
+    llm_warning_html = ""
+    llm_warning_plain = ""
+    if briefing.llm_warning:
+        llm_warning_html = (
+            f"<div style='background:#fff3cd;border-left:4px solid #f0ad4e;"
+            f"padding:12px 16px;margin-bottom:20px;border-radius:4px;'>"
+            f"<strong>⚠ LLM Unavailable</strong><br>{briefing.llm_warning}<br>"
+            f"<small>IOC/TTP extraction is regex-only this run. Severity scores, summaries, "
+            f"actor attribution, and Sigma FP review are not available.</small></div>"
+        )
+        llm_warning_plain = (
+            f"\n⚠ LLM UNAVAILABLE: {briefing.llm_warning}\n"
+            f"IOC/TTP extraction is regex-only this run.\n\n"
+        )
+
+    # Insert LLM warning banner at top of HTML body
+    if llm_warning_html:
+        html_body = llm_warning_html + html_body
+
     # Insert Sigma section before the footer line
     if sigma_html and "</body>" in html_body:
         html_body = html_body.replace("</body>", sigma_html + "</body>")
@@ -213,8 +232,8 @@ def send_briefing_email(
         msg["Cc"]  = ", ".join(cc)
 
     alt = MIMEMultipart("alternative")
-    alt.attach(MIMEText(raw_md + sigma_plain, "plain", "utf-8"))
-    alt.attach(MIMEText(html_full,            "html",  "utf-8"))
+    alt.attach(MIMEText(llm_warning_plain + raw_md + sigma_plain, "plain", "utf-8"))
+    alt.attach(MIMEText(html_full,                                 "html",  "utf-8"))
     msg.attach(alt)
 
     # Attach Sigma ZIP if rules exist

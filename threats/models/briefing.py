@@ -85,6 +85,7 @@ class DailyBriefing(BaseModel):
     ioc_counts: IOCCounts = IOCCounts()
     executive_summary: str = ""
     since_label: str = ""          # Human-readable "since" window e.g. "2026-03-11 14:00 UTC"
+    llm_warning: str = ""          # Set when LLM is unavailable (e.g. depleted credits)
 
     @property
     def all_actors(self) -> list[ThreatActor]:

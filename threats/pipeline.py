@@ -66,6 +66,10 @@ def run_pipeline_full(
 
     run_id = repo.start_run(briefing_date.isoformat())
     stats: dict = {"collected": 0, "stored": 0, "iocs": 0, "sigma": 0}
+    llm_warning: str = ""
+
+    def _is_credit_error(exc: Exception) -> bool:
+        return "credit balance is too low" in str(exc).lower()
 
     try:
         # ── Build LLM client (shared across all AI steps) ─────────────────────
@@ -139,6 +143,8 @@ def run_pipeline_full(
                 fp_flagged = validator.validate_batch(enriched)
                 log.info("IOC validator flagged %d additional false positives", fp_flagged)
             except Exception as exc:
+                if _is_credit_error(exc):
+                    llm_warning = "Anthropic API credit balance depleted — LLM enrichment unavailable. Replenish credits at console.anthropic.com → Plans & Billing."
                 log.warning("IOC validation pass failed (continuing without): %s", exc)
 
         # ── 2c. IOC research pass (assess attack-specificity for fidelity scoring) ──
@@ -148,6 +154,8 @@ def run_pipeline_full(
                 assessed = researcher.research_batch(enriched)
                 log.info("IOC researcher assessed %d IOCs for attack specificity", assessed)
             except Exception as exc:
+                if _is_credit_error(exc):
+                    llm_warning = "Anthropic API credit balance depleted — LLM enrichment unavailable. Replenish credits at console.anthropic.com → Plans & Billing."
                 log.warning("IOC research pass failed (continuing without): %s", exc)
 
         # ── 3. Store ──────────────────────────────────────────────────────────
@@ -166,10 +174,13 @@ def run_pipeline_full(
             try:
                 exec_summary = llm.generate_executive_summary(enriched)
             except Exception as exc:
+                if _is_credit_error(exc):
+                    llm_warning = "Anthropic API credit balance depleted — LLM enrichment unavailable. Replenish credits at console.anthropic.com → Plans & Billing."
                 log.warning("Executive summary generation failed: %s", exc)
 
         briefing = build_briefing(repo, briefing_date, exec_summary, since=since)
         briefing.since_label = since_label
+        briefing.llm_warning = llm_warning
 
         # ── 4b. No new data path ──────────────────────────────────────────────
         if briefing.is_empty:
@@ -189,6 +200,8 @@ def run_pipeline_full(
                 reviewer = SigmaReviewer(llm._client, llm.model, llm._limiter)
                 rules = reviewer.review_rules(rules, briefing.items, briefing_date)
             except Exception as exc:
+                if _is_credit_error(exc):
+                    llm_warning = "Anthropic API credit balance depleted — LLM enrichment unavailable. Replenish credits at console.anthropic.com → Plans & Billing."
                 log.warning("Sigma FP review failed (rules kept as-is): %s", exc)
 
         # ── 5c. IOC export ────────────────────────────────────────────────────

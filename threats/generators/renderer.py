@@ -15,6 +15,13 @@ _MD_TEMPLATE = """\
 ## {{ briefing.briefing_date }} | Generated {{ briefing.generated_at.strftime('%Y-%m-%d %H:%M UTC') }}{% if briefing.since_label %} | Since {{ briefing.since_label }}{% endif %}
 
 ---
+{% if briefing.llm_warning %}
+
+> **⚠ LLM Unavailable:** {{ briefing.llm_warning }}
+> IOC and TTP extraction is regex-only this run. Severity scores, summaries, actor attribution, and Sigma FP review are not available.
+
+---
+{% endif %}
 {% if briefing.is_empty %}
 
 ## No New Threat Data
