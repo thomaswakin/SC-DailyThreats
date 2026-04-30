@@ -172,7 +172,14 @@ def run_pipeline_full(
         exec_summary = ""
         if llm and enriched:
             try:
-                exec_summary = llm.generate_executive_summary(enriched)
+                # Fetch titles of items already reported in prior runs so the LLM
+                # can avoid rehashing them in today's executive summary.
+                recent_rows = repo.conn.execute(
+                    "SELECT title FROM intel_items WHERE fetched_at < ? ORDER BY fetched_at DESC LIMIT 60",
+                    (since.isoformat(),),
+                ).fetchall()
+                recent_titles = [r["title"] for r in recent_rows]
+                exec_summary = llm.generate_executive_summary(enriched, recent_titles=recent_titles)
             except Exception as exc:
                 if _is_credit_error(exc):
                     llm_warning = "Anthropic API credit balance depleted — LLM enrichment unavailable. Replenish credits at console.anthropic.com → Plans & Billing."

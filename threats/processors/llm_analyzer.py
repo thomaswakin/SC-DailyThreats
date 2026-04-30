@@ -245,25 +245,59 @@ class LLMAnalyzer:
             log.warning("LLM returned invalid JSON for '%s': %s", context[:60], exc)
             return None
 
-    def generate_executive_summary(self, items: list[EnrichedIntelItem]) -> str:
-        """Generate a 3-5 sentence executive summary for the daily briefing."""
+    def generate_executive_summary(
+        self,
+        items: list[EnrichedIntelItem],
+        recent_titles: list[str] | None = None,
+    ) -> str:
+        """
+        Generate an executive summary focused only on new and emerging threats.
+
+        Returns an empty string when today's items are continuations of already-reported
+        stories with no meaningful escalation, new TTPs, or new IOCs.
+
+        Args:
+            items: New intel items collected this run.
+            recent_titles: Titles of items already reported in previous briefings
+                           (used to detect duplicate coverage).
+        """
         if not items:
-            return "No new threat intelligence collected today."
+            return ""
 
         self._limiter.acquire()
-        bullet_points = "\n".join(
+
+        today_bullets = "\n".join(
             f"- [{i.severity_label}] {i.title} ({i.source_name})"
             for i in sorted(items, key=lambda x: x.severity, reverse=True)[:20]
         )
+
+        previously_reported_section = ""
+        if recent_titles:
+            recent_sample = "\n".join(f"- {t}" for t in recent_titles[:40])
+            previously_reported_section = (
+                f"\n\nPREVIOUSLY REPORTED (already covered in prior briefings — do not rehash):\n"
+                f"{recent_sample}"
+            )
+
+        user_content = f"TODAY'S NEW ITEMS:\n{today_bullets}{previously_reported_section}"
 
         response = self._client.messages.create(
             model=self.model,
             max_tokens=512,
             system=(
-                "You are a CISO-level threat intelligence analyst. Write a 3-5 sentence "
-                "executive summary of today's threat landscape based on the items below. "
-                "Be specific about active threats. Plain text only, no bullet points."
+                "You are a CISO-level threat intelligence analyst writing a daily briefing.\n\n"
+                "Your task: Write a concise executive summary focused ONLY on what is genuinely "
+                "new or materially escalating since the previous briefing. Be specific — name "
+                "the threat actors, campaigns, or techniques. Plain text only, no bullet points.\n\n"
+                "Rules:\n"
+                "- If today's items are continued coverage of already-reported incidents with no "
+                "new TTPs, no new IOCs, and no meaningful escalation, output exactly: NO_NEW_FINDINGS\n"
+                "- If there are genuine new threats or significant developments, summarize them in "
+                "3-5 sentences. Do not mention the previously-reported items unless they have "
+                "materially escalated.\n"
+                "- Prefer 'No new findings today' over duplicating prior summaries."
             ),
-            messages=[{"role": "user", "content": bullet_points}],
+            messages=[{"role": "user", "content": user_content}],
         )
-        return response.content[0].text.strip()
+        result = response.content[0].text.strip()
+        return "" if result == "NO_NEW_FINDINGS" else result

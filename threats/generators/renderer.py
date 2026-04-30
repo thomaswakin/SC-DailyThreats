@@ -35,7 +35,7 @@ The pipeline is operating normally and will report when new indicators or report
 
 ## Executive Summary
 
-{{ briefing.executive_summary or "No executive summary generated." }}
+{{ briefing.executive_summary or "No new findings to highlight today." }}
 
 ---
 {% if briefing.multi_source_clusters %}
