@@ -46,7 +46,15 @@ def build_briefing(
     reobserved_iocs = [_row_to_ioc(r) for r in repo.get_reobserved_iocs_since(since)]
     _flag_likely_fps(new_iocs + reobserved_iocs, items)
     fp_count = sum(1 for i in new_iocs + reobserved_iocs if i.likely_fp)
-    log.info("IOCs: %d new, %d re-observed (%d likely FP)", len(new_iocs), len(reobserved_iocs), fp_count)
+
+    # Publish medium+ fidelity only — low-fidelity indicators go to case observables,
+    # not the daily briefing or IOC export.
+    new_iocs = [i for i in new_iocs if i.fidelity not in ("low", "fp")]
+    reobserved_iocs = [i for i in reobserved_iocs if i.fidelity not in ("low", "fp")]
+    log.info(
+        "IOCs: %d new, %d re-observed (%d likely FP, low-fidelity suppressed)",
+        len(new_iocs), len(reobserved_iocs), fp_count,
+    )
 
     # ── TTPs: new vs re-observed ──────────────────────────────────────────────
     new_ttps = [_row_to_ttp(r) for r in repo.get_new_ttps_since(since)]

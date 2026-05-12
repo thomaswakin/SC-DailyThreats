@@ -94,10 +94,14 @@ def generate_ioc_export(briefing: DailyBriefing, output_dir: Path) -> Path | Non
     output_dir.mkdir(parents=True, exist_ok=True)
     as_of = briefing.briefing_date
 
-    # Combine new + re-observed; exclude hard FPs
-    all_iocs = [i for i in briefing.new_iocs + briefing.reobserved_iocs if not i.likely_fp]
+    # Combine new + re-observed; exclude FPs and low-fidelity indicators.
+    # Low-fidelity IOCs are handled as case observables, not published in the export.
+    all_iocs = [
+        i for i in briefing.new_iocs + briefing.reobserved_iocs
+        if not i.likely_fp and _fidelity(i) != "low"
+    ]
     if not all_iocs:
-        log.info("IOC export: no IOCs to export")
+        log.info("IOC export: no medium+ fidelity IOCs to export")
         return None
 
     # Sort: fidelity desc, type, value

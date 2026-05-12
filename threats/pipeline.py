@@ -211,6 +211,13 @@ def run_pipeline_full(
                     llm_warning = "Anthropic API credit balance depleted — LLM enrichment unavailable. Replenish credits at console.anthropic.com → Plans & Billing."
                 log.warning("Sigma FP review failed (rules kept as-is): %s", exc)
 
+        # Drop high-FP-risk rules — only medium and below are published.
+        # Rules without a review (fp_risk="") are retained; they haven't been assessed yet.
+        before = len(rules)
+        rules = [r for r in rules if r.fp_risk != "high"]
+        if before - len(rules):
+            log.info("Suppressed %d high-FP-risk Sigma rules", before - len(rules))
+
         # ── 5c. IOC export ────────────────────────────────────────────────────
         ioc_export_path = generate_ioc_export(briefing, Path(briefings_dir) / "ioc_exports")
         if ioc_export_path:
