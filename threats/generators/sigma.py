@@ -224,15 +224,33 @@ def _render_artifact_rule(
     parent_process   = artifact.get("parent_process")  or []
     event_id         = [str(e) for e in (artifact.get("event_id") or [])]
 
+    # A behavioral anchor means the rule detects HOW something runs, not just WHAT.
+    # Process name, command line, parent process, and registry keys cannot be matched
+    # by a simple IOC lookup — they require behavioral correlation.
+    behavioral_anchor = bool(process_name or command_line or parent_process or registry_key)
+
+    # IOC-equivalent categories — skip unless anchored by behavioral conditions:
+    #
+    #   dns_query      — domain names are IOC-equivalent; always go to IOC export
+    #   network_connection / firewall — IP+port alone is an IOC lookup; only generate
+    #                    a Sigma rule when a process/command context makes it behavioral
+    #   file_event     — a filename path alone is a filename IOC; require a behavioral
+    #                    anchor (process/cmdline) to justify the Sigma overhead
     _required = {
-        "process_creation":   process_name or command_line,
-        "file_event":         file_path,
-        "registry_event":     registry_key,
-        "network_connection": network_dst_ip or network_dst_port,
-        "firewall":           network_dst_ip or network_dst_port,
-        "dns_query":          dns_query,
+        "process_creation":   bool(process_name or command_line),
+        "file_event":         bool(file_path) and behavioral_anchor,
+        "registry_event":     bool(registry_key),
+        "network_connection": behavioral_anchor and bool(network_dst_ip or network_dst_port),
+        "firewall":           behavioral_anchor and bool(network_dst_ip or network_dst_port),
+        "dns_query":          False,  # always IOC-equivalent → IOC export only
     }
-    if not _required.get(logsource_cat, process_name or command_line or file_path):
+    passes = _required.get(logsource_cat, bool(process_name or command_line or file_path))
+    if not passes:
+        log.debug(
+            "Skipping IOC-equivalent Sigma rule [%s/%s] — IP, domain, and filename-only "
+            "matches belong in the IOC export, not Sigma rules",
+            technique_id, logsource_cat,
+        )
         return None
 
     tactic_tag    = _tactic_for_technique(technique_id)

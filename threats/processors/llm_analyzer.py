@@ -76,20 +76,32 @@ Rules:
 - detection_artifacts: CRITICAL RULES:
   * Only include entries when you can extract CONCRETE artifacts from the article text
   * Do NOT invent generic placeholders — if the article doesn't mention specific process
-    names, file paths, command lines, registry keys, or network indicators, omit that field
+    names, command lines, or registry keys, omit that field
   * Do NOT add an entry if ALL detection arrays would be empty
-  * logsource_category must be one of: process_creation, network_connection, file_event,
-    registry_event, dns_query, firewall
+  * logsource_category must be one of: process_creation, file_event, registry_event,
+    network_connection, firewall
+  * DO NOT use logsource_category "dns_query" — domain names are handled as IOC indicators
   * logsource_product: windows, linux, macos — omit (empty string) for network/firewall rules
   * command_line values: exact substrings or distinctive patterns that appear in command logs
   * One entry per technique+logsource combination — combine related artifacts into one entry
   * If the article describes no specific technical artifacts, return detection_artifacts: []
-  * FILENAMES AND SCRIPTS: always extract into detection fields, not just descriptions:
-    - Shell scripts (e.g. aic.sh, fwr.sh, install.sh) → command_line AND file_path
-    - Dropped/renamed binaries (e.g. renamed to 'kad', '.asusrouter') → process_name AND file_path
-    - Scheduled tasks or cron entries referencing filenames → command_line
-    - Any filename mentioned as downloaded, executed, or persisted must appear in a detection field
-  * ALL confirmed C2/staging IPs mentioned in the article → network_dst_ip (not just the primary one)
+  * BEHAVIORAL ANCHOR REQUIRED: every detection_artifact entry MUST include at least one
+    behavioral field — process_name, command_line, parent_process, or registry_key.
+    Entries with ONLY network_dst_ip, network_dst_port, dns_query, or file_path are
+    IOC-equivalent and must NOT be included here — those values go into the IOC export.
+    - Pure IP destination rules (network_dst_ip only) → skip, use IOC export
+    - Pure domain rules (dns_query only) → skip, use IOC export
+    - Pure filename rules (file_path only, no process/cmdline) → skip, use IOC export
+  * VALID behavioral anchors that justify a Sigma rule:
+    - process_creation: process_name + command_line, or parent_process + process_name
+    - file_event: file_path + (process_name OR command_line) showing who created it
+    - registry_event: registry_key is sufficient (no IOC equivalent for registry monitoring)
+    - network_connection: network_dst_ip OR port + process_name showing which process connects
+  * FILENAMES AND SCRIPTS: extract into detection fields WITH behavioral context:
+    - Shell scripts (e.g. aic.sh) → command_line showing how it's invoked
+    - Dropped binaries (e.g. renamed to 'kad') → process_name AND file_path (file_event)
+    - Scheduled tasks referencing filenames → command_line in process_creation
+  * ALL confirmed C2/staging IPs → network_dst_ip, but ONLY paired with process_name
   * Do not put artifact details only in description and leave detection arrays empty
 - campaign_names: named operations or campaigns explicitly referenced (e.g. "Operation ShadowHammer",
   "Volt Typhoon"). Use exact names as stated. Empty array [] if none mentioned.
