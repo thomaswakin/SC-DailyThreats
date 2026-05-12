@@ -69,6 +69,7 @@ email:
     - "cbriguet@stellarcyber.ai"
     - "xyu@stellarcyber.ai"
     - "hwu@stellarcyber.ai"
+    - "cgarza@stellarcyber.ai"
   subject_prefix: "[ThreatIntel]"
   # SMTP port — 587 (STARTTLS) is correct for Gmail/O365/most providers
   smtp_port: 587
